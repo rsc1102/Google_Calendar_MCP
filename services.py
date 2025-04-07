@@ -72,9 +72,9 @@ async def list_events(
         description (str, optional): Filter events by text found in the event description.
         location (str, optional): Filter events based on their location.
         timeMin (str, optional): ISO 8601 formatted lower time bound (exclusive)
-            for filtering events by end time. Must be in local time and have timezone offset. 
+            for filtering events by end time. Must be in local time and have timezone offset.
         timeMax (str, optional): ISO 8601 formatted upper time bound (exclusive)
-            for filtering events by start time. Must be in local time and have timezone offset. 
+            for filtering events by start time. Must be in local time and have timezone offset.
         maxResults (int, optional): Maximum number of events to return.
 
     Returns:
@@ -93,10 +93,13 @@ async def list_events(
         return "timeMin in incorrect format. It should be in ISO format"
 
     try:
-        timeMax = datetime.fromisoformat(timeMax).astimezone().isoformat() if timeMax is not None else None
+        timeMax = (
+            datetime.fromisoformat(timeMax).astimezone().isoformat()
+            if timeMax is not None
+            else None
+        )
     except Exception:
         return "timeMax in incorrect format. It should be in ISO format"
-
 
     try:
         maxResults = int(maxResults)
@@ -105,8 +108,6 @@ async def list_events(
 
     search_parameters = [x for x in [summary, description, location] if x is not None]
     search_query = " ".join(search_parameters)
-    
-    print(timeMin)
 
     events_result = (
         service.events()
@@ -140,6 +141,7 @@ async def list_events(
         summary = event.get("summary", "N/A")
         description = event.get("description", "N/A")
         location = event.get("location", "N/A")
+        event_id = event.get('id',"N/A")
 
         event_info = f"""
 index: {i + 1}
@@ -148,8 +150,64 @@ end: {end}
 summary: {summary}
 description: {description}
 location: {location}
+event_id: {event_id}
 """
 
         events_info.append(event_info)
 
     return "\n--\n".join(events_info)
+
+
+async def create_event(
+    start: str,
+    end: str,
+    timeZone: str,
+    summary: str | None = None,
+    description: str | None = None,
+    location: str | None = None,
+) -> str:
+    """
+    Creates a calendar event using the provided details.
+
+    Args:
+        start (str): Event start time in ISO 8601 format (e.g., '2025-04-06T10:00:00-04:00').
+        end (str): Event end time in ISO 8601 format (e.g., '2025-04-06T11:00:00-04:00').
+        timeZone (str): User timezone formatted as an IANA Time Zone Database name (e.g. "Europe/Zurich").
+        summary (str, optional): Short title or subject of the event. Defaults to None.
+        description (str, optional): Detailed description or notes for the event. Defaults to None.
+        location (str, optional): Physical or virtual location of the event. Defaults to None.
+    """
+
+    service = calender_service()
+    if service is None:
+        return "Unable to communicate with the Google Calendar Service."
+
+    # datetime validation
+    try:
+        datetime.fromisoformat(start)
+    except Exception:
+        return "Event start time not in ISO format"
+
+    try:
+        datetime.fromisoformat(end)
+    except Exception:
+        return "Event end time not in ISO format"
+
+    event = {
+        "start": {"dateTime": start, "timeZone": timeZone},
+        "end": {"dateTime": end, "timeZone": timeZone},
+    }
+
+    for key, value in zip(
+        ["summary", "description", "location"], [summary, description, location]
+    ):
+        if value is not None:
+            event[key] = value
+
+    try:
+        event = service.events().insert(calendarId="primary", body=event).execute()
+        return f"Event created with id {event.get('id')}"
+    except Exception:
+        return "Event could not be created."
+
+

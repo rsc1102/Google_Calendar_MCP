@@ -26,9 +26,9 @@ async def list_events(
         description (str, optional): Filter events by text found in the event description.
         location (str, optional): Filter events based on their location.
         timeMin (str, optional): ISO 8601 formatted lower time bound (exclusive)
-            for filtering events by end time. Must be in local time and have timezone offset. 
+            for filtering events by end time. Must be in local time and have timezone offset.
         timeMax (str, optional): ISO 8601 formatted upper time bound (exclusive)
-            for filtering events by start time. Must be in local time and have timezone offset. 
+            for filtering events by start time. Must be in local time and have timezone offset.
         maxResults (int, optional): Maximum number of events to return.
 
     Returns:
@@ -41,6 +41,37 @@ async def list_events(
         timeMin=timeMin,
         timeMax=timeMax,
         maxResults=maxResults,
+    )
+
+
+@mcp.tool()
+async def create_event(
+    start: str,
+    end: str,
+    timeZone: str,
+    summary: str | None = None,
+    description: str | None = None,
+    location: str | None = None,
+) -> str:
+    """
+    Creates a calendar event using the provided details.
+
+    Args:
+        start (str): Event start time in ISO 8601 format (e.g., '2025-04-06T10:00:00-07:00').
+        end (str): Event end time in ISO 8601 format (e.g., '2025-04-06T11:00:00-07:00').
+        timeZone (str): User timezone formatted as an IANA Time Zone Database name (e.g. "Europe/Zurich").
+        summary (str, optional): Short title or subject of the event. Defaults to None.
+        description (str, optional): Detailed description or notes for the event. Defaults to None.
+        location (str, optional): Physical or virtual location of the event. Defaults to None.
+    """
+
+    return await services.create_event(
+        start=start,
+        end=end,
+        timeZone=timeZone,
+        summary=summary,
+        description=description,
+        location=location,
     )
 
 
