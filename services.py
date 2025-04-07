@@ -141,7 +141,7 @@ async def list_events(
         summary = event.get("summary", "N/A")
         description = event.get("description", "N/A")
         location = event.get("location", "N/A")
-        event_id = event.get('id',"N/A")
+        event_id = event.get("id", "N/A")
 
         event_info = f"""
 index: {i + 1}
@@ -211,3 +211,20 @@ async def create_event(
         return "Event could not be created."
 
 
+async def delete_event(event_id: str):
+    """
+    Deletes an event from the calender.
+
+    Args:
+        event_id: Event identifier.
+    """
+
+    service = calender_service()
+    if service is None:
+        return "Unable to communicate with the Google Calendar Service."
+
+    try:
+        service.events().delete(calendarId="primary", eventId=event_id).execute()
+        return f"Event with id {event_id} is deleted."
+    except Exception:
+        return "Event could not be deleted."

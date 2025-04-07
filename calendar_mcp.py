@@ -75,6 +75,18 @@ async def create_event(
     )
 
 
+@mcp.tool()
+async def delete_event(event_id: str):
+    """
+    Deletes an event from the calender.
+
+    Args:
+        event_id: Event identifier.
+    """
+
+    return await services.delete_event(event_id=event_id)
+
+
 if __name__ == "__main__":
     # Run MCP server
     mcp.run(transport="stdio")
