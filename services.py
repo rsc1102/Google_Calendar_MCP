@@ -228,3 +228,82 @@ async def delete_event(event_id: str):
         return f"Event with id {event_id} is deleted."
     except Exception:
         return "Event could not be deleted."
+
+
+async def update_event(
+    event_id: str,
+    start: str | None = None,
+    end: str | None = None,
+    timeZone: str | None = None,
+    summary: str | None = None,
+    description: str | None = None,
+    location: str | None = None,
+):
+    """
+    Updates an event by replacing specified fields with new values.
+    Any fields not included in the request will retain their existing values.
+
+    Args:
+        event_id (str): Event identifier.
+        start (str, optional): Event start time in ISO 8601 format (e.g., '2025-04-06T10:00:00-04:00'). Defaults to None.
+        end (str, optional): Event end time in ISO 8601 format (e.g., '2025-04-06T11:00:00-04:00'). Defaults to None.
+        timeZone (str, optional): User timezone formatted as an IANA Time Zone Database name (e.g. "Europe/Zurich"). Defaults to None.
+        summary (str, optional): Short title or subject of the event. Defaults to None.
+        description (str, optional): Detailed description or notes for the event. Defaults to None.
+        location (str, optional): Physical or virtual location of the event. Defaults to None.
+    """
+    
+    service = calender_service()
+    if service is None:
+        return "Unable to communicate with the Google Calendar Service."
+    
+    updates = {}
+    updated_parameters = set()
+    
+    if start is not None:
+        try:
+            datetime.fromisoformat(start)
+        except Exception:
+            return "Event start time not in ISO format"
+        updates['start'] = {}
+        updates['start']['dateTime'] = start
+        updated_parameters.add("start")
+        
+    if end is not None:
+        try:
+            datetime.fromisoformat(end)
+        except Exception:
+            return "Event start time not in ISO format"
+        updates['end'] = {}
+        updates['end']['dateTime'] = end
+        updated_parameters.add("end")
+        
+    if timeZone is not None:
+        if "start" not in updates:
+            updates["start"] = {}
+        updates['start']['timeZone'] = timeZone
+        updated_parameters.add("start")
+        
+        if "end" not in updates:
+            updates["end"] = {}
+        updates['end']['timeZone'] = timeZone
+        updated_parameters.add("end")
+        
+    for key, value in zip(
+        ["summary", "description", "location"], [summary, description, location]
+    ):
+        if value is not None:
+            updates[key] = value
+            updated_parameters.add(key)
+            
+    updated_parameters = ",".join(updated_parameters)
+    try:
+        _ = service.events().patch(calendarId='primary', eventId=event_id, body=updates).execute()
+        return f"Event with id {event_id} updated with [{''.join(updated_parameters)}] "
+    except Exception:
+        return "Event could not be updated."
+    
+            
+        
+    
+    

@@ -87,6 +87,41 @@ async def delete_event(event_id: str):
     return await services.delete_event(event_id=event_id)
 
 
+@mcp.tool()
+async def update_event(
+    event_id: str,
+    start: str | None = None,
+    end: str | None = None,
+    timeZone: str | None = None,
+    summary: str | None = None,
+    description: str | None = None,
+    location: str | None = None,
+):
+    """
+    Updates an event by replacing specified fields with new values.
+    Any fields not included in the request will retain their existing values.
+
+    Args:
+        event_id (str): Event identifier.
+        start (str, optional): Event start time in ISO 8601 format (e.g., '2025-04-06T10:00:00-04:00'). Defaults to None.
+        end (str, optional): Event end time in ISO 8601 format (e.g., '2025-04-06T11:00:00-04:00'). Defaults to None.
+        timeZone (str, optional): User timezone formatted as an IANA Time Zone Database name (e.g. "Europe/Zurich"). Defaults to None.
+        summary (str, optional): Short title or subject of the event. Defaults to None.
+        description (str, optional): Detailed description or notes for the event. Defaults to None.
+        location (str, optional): Physical or virtual location of the event. Defaults to None.
+    """
+
+    return await services.update_event(
+        event_id=event_id,
+        start=start,
+        end=end,
+        timeZone=timeZone,
+        summary=summary,
+        description=description,
+        location=location,
+    )
+
+
 if __name__ == "__main__":
     # Run MCP server
     mcp.run(transport="stdio")
