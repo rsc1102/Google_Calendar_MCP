@@ -83,6 +83,14 @@ This repository provides a Model Context Protocol (MCP) server that integrates w
    **Note:** When using the server for the first time, Google will prompt you to authenticate and grant permission to access your calendar.
 
 ---
+## 🎬 In Action
+
+
+https://github.com/user-attachments/assets/75da4943-15c4-4ec2-bc5d-af4af3509031
+
+
+
+---
 
 ## 📬 Support
 For issues or questions, please open an issue in this repository.
