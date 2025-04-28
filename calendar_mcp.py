@@ -49,7 +49,7 @@ async def create_event(
     start: str,
     end: str,
     timeZone: str,
-    summary: str | None = None,
+    summary: str,
     description: str | None = None,
     location: str | None = None,
 ) -> str:
@@ -60,7 +60,7 @@ async def create_event(
         start (str): Event start time in ISO 8601 format (e.g., '2025-04-06T10:00:00-07:00').
         end (str): Event end time in ISO 8601 format (e.g., '2025-04-06T11:00:00-07:00').
         timeZone (str): User timezone formatted as an IANA Time Zone Database name (e.g. "Europe/Zurich").
-        summary (str, optional): Short title or subject of the event. Defaults to None.
+        summary (str): Short title or subject of the event.
         description (str, optional): Detailed description or notes for the event. Defaults to None.
         location (str, optional): Physical or virtual location of the event. Defaults to None.
     """
