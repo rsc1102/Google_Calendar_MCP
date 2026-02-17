@@ -6,6 +6,9 @@ from googleapiclient.discovery import build
 from datetime import datetime
 
 
+CALENDAR_ID = os.environ.get("GOOGLE_CALENDAR_ID", "primary")
+
+
 class CalenderService:
     def __init__(self):
         self.__calender_service = None
@@ -112,7 +115,7 @@ async def list_events(
     events_result = (
         service.events()
         .list(
-            calendarId="primary",
+            calendarId=CALENDAR_ID,
             timeMin=timeMin,
             timeMax=timeMax,
             maxResults=maxResults,
@@ -205,7 +208,7 @@ async def create_event(
             event[key] = value
 
     try:
-        event = service.events().insert(calendarId="primary", body=event).execute()
+        event = service.events().insert(calendarId=CALENDAR_ID, body=event).execute()
         return f"Event created with id {event.get('id')}"
     except Exception:
         return "Event could not be created."
@@ -224,7 +227,7 @@ async def delete_event(event_id: str):
         return "Unable to communicate with the Google Calendar Service."
 
     try:
-        service.events().delete(calendarId="primary", eventId=event_id).execute()
+        service.events().delete(calendarId=CALENDAR_ID, eventId=event_id).execute()
         return f"Event with id {event_id} is deleted."
     except Exception:
         return "Event could not be deleted."
