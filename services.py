@@ -301,7 +301,7 @@ async def update_event(
             
     updated_parameters = ",".join(updated_parameters)
     try:
-        _ = service.events().patch(calendarId='primary', eventId=event_id, body=updates).execute()
+        _ = service.events().patch(calendarId=CALENDAR_ID, eventId=event_id, body=updates).execute()
         return f"Event with id {event_id} updated with [{''.join(updated_parameters)}] "
     except Exception:
         return "Event could not be updated."
